@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<QBWCXML>
+    <AppName>SysQB</AppName>
+    <AppID></AppID>
+    <AppURL>your url</AppURL>
+    <AppDescription>API QUickBooks Desktop</AppDescription>
+    <AppSupport>your support url</AppSupport>
+    <UserName>your username</UserName>
+    <OwnerID>{54a9fd50-79e9-44e4-8fef-98411c2e8785}</OwnerID>
+    <FileID>{30730c9c-c1b7-4773-a12d-b193437a8fef}</FileID>
+    <QBType>QBFS</QBType>
+    <Scheduler>
+        <RunEveryNMinutes>2</RunEveryNMinutes>
+    </Scheduler>
+</QBWCXML>

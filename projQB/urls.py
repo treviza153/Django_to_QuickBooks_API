@@ -18,14 +18,14 @@ from django.urls import path
 
 from spyne.protocol.soap import Soap11
 from spyne.server.django import DjangoView
-from appConnection.views.connection import QuickBooksService
-from appEnvio.views.views import envio
+from appConnection.views.connection import QuickBooksService, Support
 
 urlpatterns = [
-    path('envio/', envio),
+    path('support/', Support),
     path('conexao/', DjangoView.as_view(
         services=[QuickBooksService], tns='projetoQB.appConnection.QuickBooksService',
         in_protocol=Soap11(validator='lxml'), out_protocol=Soap11())),
 ]
+
 
 
