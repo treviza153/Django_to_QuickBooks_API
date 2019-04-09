@@ -33,6 +33,16 @@ from spyne import Application, rpc, ServiceBase, Iterable, Integer, Unicode, Str
 from spyne.protocol.soap import Soap11
 from spyne.server.wsgi import WsgiApplication
 
+from django.http import HttpResponse
+
+class Support:
+
+    def getSUpport(self, request):
+
+        html = "<html><body>Example of a supports page</body></html>"
+
+        return HttpResponse(html)
+
 class QuickBooksService(ServiceBase):
     @rpc(String, _returns=Iterable(String))
     def serverVersion(self, ticket):
