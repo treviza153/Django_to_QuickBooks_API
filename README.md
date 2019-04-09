@@ -1,4 +1,4 @@
-# Django_to_QuickBooks_SOAP_SERVER
+# Django_to_QuickBooks_API
 
 A example of a Django (Python Web Framework) API that's connects with Quickbooks Desktop Web Connector. 
 
