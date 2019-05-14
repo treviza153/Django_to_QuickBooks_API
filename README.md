@@ -16,7 +16,7 @@ pip install django
 
 Spyne:
 ```
-pip install spyne
+easy_install spyne
 ```
 
 Lxml:
