@@ -28,71 +28,68 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-from spyne import Application, rpc, ServiceBase, Iterable, Integer, Unicode, String
+from spyne.application import Application
+from spyne.decorator import rpc
 from spyne.protocol.soap import Soap11
-from spyne.server.wsgi import WsgiApplication
-
+from spyne.service import ServiceBase
+from spyne.model.complex import Array, Unicode
+from spyne.model.primitive import Integer, String
+from spyne.server.django import DjangoApplication
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+
 
 class Support:
 
-    def getSUpport(self, request):
-
+    def get_support(self, request):
         html = "<html><body>Example of a supports page</body></html>"
 
         return HttpResponse(html)
 
+
 class QuickBooksService(ServiceBase):
-    @rpc(String, _returns=Iterable(String))
-    def serverVersion(self, ticket):
-        print('serverVersion()')
-        print(ticket)
-        return '1.0'
 
-
-    @rpc(String, Integer, _returns=Iterable(Unicode))
-    def authenticate(self, strUserName, strPassword):
-        print('authenticate()')
-        list = []
-        results.append('{bcf30422-afd1-43ac-b3bc-a7482c504dda}')
-        results.append('your_user')
-        results.append('your_psswd')
-        results.append('300')
+    @rpc(Unicode, Unicode, _returns=Array(Unicode))
+    def authenticate(ctx, strUserName, strPassword):
+        print('authenticate() has been called')
+        results = []
+        results.append('{57F3B9B1-86F1-4fcc-B1EE-566DE1813D20}')
+        results.append('')
+        results.append('')
 
         print(strUserName)
         print(strPassword)
-        print(list)
-        return list
+        print(results)
+        return results
 
-    @rpc(Unicode, _returns=Iterable(Unicode))
-    def clientVersion(self, strVersion):
+    @rpc(Unicode, _returns=Unicode)
+    def clientVersion(ctx, strVersion):
         print('clientVersion()')
         print(strVersion)
-        return '2.2.0.93'
+        return ""
 
-    @rpc(Unicode, _returns=Iterable(Unicode))
-    def closeConnection(self, ticket):
+    @rpc(Unicode, _returns=Unicode)
+    def closeConnection(ctx, ticket):
         print('closeConnection()')
         print(ticket)
         return 'closeConnection() called on WS'
 
-    @rpc(Unicode, Integer, Integer, _returns=Iterable(Unicode))
-    def connectionError(self, ticket, hresult, message):
+    @rpc(Unicode, Unicode, Unicode, _returns=Unicode)
+    def connectionError(ctx, ticket, hresult, message):
         print('connectionError')
         print(ticket)
         print(hresult)
         print(message)
         return 'done'
 
-    @rpc(Unicode, _returns=Iterable(Unicode))
-    def getLastError(self, ticket):
+    @rpc(Unicode, _returns=Unicode)
+    def getLastError(ctx, ticket):
         print('lastError()')
         print(ticket)
-        return 'Problems foo bar'
+        return 'Deu Ruim'
 
-    @rpc(Unicode, Integer, Integer, Integer, _returns=Iterable(Unicode))
-    def receiveResponseXML(self, ticket, response, hresult, message):
+    @rpc(Unicode, Unicode, Unicode, Unicode, _returns=Integer)
+    def receiveResponseXML(ctx, ticket, response, hresult, message):
         print('receiveResponseXML()')
         print("ticket=" + ticket)
         print("response=" + response)
@@ -101,57 +98,62 @@ class QuickBooksService(ServiceBase):
             print("message=" + message)
         return 100
 
-    @rpc(Unicode, Integer, Integer, Integer, Integer, Integer, _returns=Iterable(Unicode))
-    def sendRequestXML(self, ticket, strHCPResponse, strCompanyFileName, qbXMLCountry, qbXMLMajorVers, qbXMLMinorVers):
-        print('sendRequestXML()')
-        print(strHCPResponse)
-        xml = "<?xml version=\"1.0\" ?>" + \
-              "<?qbxml version=\"2.0\"?>" + \
-              "<QBXML>" + \
-              "<QBXMLMsgsRq onError=\"stopOnError\">" + \
-              "<ItemQueryRq></ItemQueryRq>" + \
-              "</QBXMLMsgsRq>" + \
-              "</QBXML>"
-        return xml
+    @rpc(Unicode, Unicode, Unicode, Unicode, Integer, Integer, _returns=String)
+    def sendRequestXML(ctx, ticket, strHCPResponse, strCompanyFileName, qbXMLCountry, qbXMLMajorVers,
+                       qbXMLMinorVers):
+        print('sendRequestXML() has been called')
 
-    @rpc(Unicode, Integer, _returns=Iterable(Unicode))
-    def interactiveUrl(self, ticket, sessionID):
+        xml = b'<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<?qbxml version="13.0"?><QBXML><QBXMLMsgsRq onError="continueOnError"><BillAddRq><BillAdd defMacro="MACROTYPE"><VendorRef><FullName></FullName></VendorRef><TxnDate>2019-07-01</TxnDate><RefNumber>14329256</RefNumber><Memo>786953421</Memo><ExpenseLineAdd><AccountRef></FullName></AccountRef><Amount>,10</Amount></ExpenseLineAdd></BillAdd></BillAddRq><BillAddRq><BillAdd><VendorRef><FullName></FullName></VendorRef><TxnDate>2019-07-01</TxnDate><RefNumber>14329256</RefNumber><Memo>786953421</Memo><ExpenseLineAdd><AccountRef><FullName></FullName></AccountRef><Amount>,10</Amount></ExpenseLineAdd></BillAdd></BillAddRq></QBXMLMsgsRq></QBXML>'
+
+        xml2 = "<?xml version=\"1.0\"?>" + \
+                "<?qbxml version=\"13.0\"?>" + \
+                    "<QBXML>" + \
+                        "<QBXMLMsgsRq onError=\"stopOnError\">" + \
+                            "<InvoiceAddRq>" + \
+                                "<InvoiceAdd>" + \
+                                    "<CustomerRef>" + \
+                                        "<FullName></FullName>" + \
+                                    "</CustomerRef>" + \
+                                    "<TxnDate>2019-06-30</TxnDate>" + \
+                                    "<RefNumber></RefNumber>" + \
+                                    "<InvoiceLineAdd defMacro=\"MACROTYPE\">" + \
+                                        "<ItemRef>" + \
+                                            "<FullName></FullName>" + \
+                                        "</ItemRef>" + \
+                                        "<Desc>123456789</Desc>" + \
+                                        "<Amount>2</Amount>" + \
+                                    "</InvoiceLineAdd>" + \
+                                "</InvoiceAdd>" + \
+                            "</InvoiceAddRq>" + \
+                        "</QBXMLMsgsRq>" + \
+                    "</QBXML>"
+
+        return None
+
+    @rpc(Unicode, Unicode, _returns=Unicode)
+    def interactiveUrl(ctx, ticket, sessionID):
         print('interactiveUrl')
         print(ticket)
         print(sessionID)
         return 'http://localhost/test'
 
-    @rpc(Unicode, _returns=Iterable(Unicode))
-    def interactiveDone(self, ticket):
+    @rpc(Unicode, _returns=Unicode)
+    def interactiveDone(ctx, ticket):
         print('interactiveDone()')
         print(ticket)
         return 'Done'
 
-    @rpc(Unicode, Integer, _returns=Iterable(Unicode))
-    def interactiveRejected(self, ticket, reason):
+    @rpc(Unicode, Unicode, _returns=Unicode)
+    def interactiveRejected(ctx, ticket, reason):
         print('interactiveRejected()')
         print(ticket)
         print(reason)
-        return 'Message to show'
+        return 'Interactive mode rejected'
 
 
-application = Application([QuickBooksService], 'projetoQB.appConexao.connection.QuickBooksService',
-                          in_protocol=Soap11(validator='lxml'),
-                          out_protocol=Soap11())
+app = Application([QuickBooksService],
+                  'http://developer.intuit.com/',
+                  in_protocol=Soap11(validator='lxml'),
+                  out_protocol=Soap11())
 
-wsgi_application = WsgiApplication(application)
-
-
-if __name__ == '__main__':
-    import logging
-
-    from wsgiref.simple_server import make_server
-
-    logging.basicConfig(level=logging.DEBUG)
-    logging.getLogger('spyne.protocol.xml').setLevel(logging.DEBUG)
-
-    logging.info("listening to http://127.0.0.1:8000")
-    logging.info("wsdl is at: http://localhost:8000/?wsdl")
-
-    server = make_server('127.0.0.1', 8000, wsgi_application)
-    server.serve_forever()
+qb_service = csrf_exempt(DjangoApplication(app))
